@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Copyright (c) 2016 Catalyst.net Ltd
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+# Automate typing a TOTP selected using dmenu. Michael Fincham <michael.fincham@catalyst.net.nz>.
+
+shopt -s nullglob globstar
+
+typeit=0
+if [[ $1 == "--type" ]]; then
+	typeit=1
+	shift
+fi
+
+selection=$(yubioath | sed -e 's/\[Touch credential\]//' -e 's/[0-9]*$//' -e 's/[ \t]*$//' | dmenu)
+
+[[ -n $selection ]] || exit
+
+lines=0
+while read -r line; do
+    if [[ $line == 'Touch your YubiKey...' ]]; then
+        notify-send "Touch you YubiKey to get the TOTP for $selection..."
+    else
+        line=($line)
+        totp=${line[-1]}
+        ((lines++))
+    fi
+done < <(yubioath show "$selection" 2>&1)
+
+if [[ $lines -gt 1 ]]; then
+    notify-send "Error getting TOTP for $selection."
+    exit 1
+fi
+
+if [[ $typeit -eq 0 ]]; then
+	echo $totp
+else
+	xdotool - <<<"type --clearmodifiers -- $totp"
+    notify-send "TOTP for $selection has been typed."
+fi
