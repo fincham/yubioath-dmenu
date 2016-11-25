@@ -32,7 +32,7 @@ selection=$(yubioath | sed -e 's/\[Touch credential\]//' -e 's/[0-9]*$//' -e 's/
 lines=0
 while read -r line; do
     if [[ $line == 'Touch your YubiKey...' ]]; then
-        notify-send "Touch you YubiKey to get the TOTP for $selection..."
+        notify-send "Touch your YubiKey to get the TOTP for $selection..."
     else
         line=($line)
         totp=${line[-1]}
