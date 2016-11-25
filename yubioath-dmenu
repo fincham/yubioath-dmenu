@@ -25,6 +25,11 @@ if [[ $1 == "--type" ]]; then
 	shift
 fi
 
+if ! yubioath >/dev/null 2>&1; then
+    notify-send "Error getting TOTP list."
+    exit 1
+fi
+
 selection=$(yubioath | sed -e 's/\[Touch credential\]//' -e 's/[0-9]*$//' -e 's/[ \t]*$//' | dmenu)
 
 [[ -n $selection ]] || exit
