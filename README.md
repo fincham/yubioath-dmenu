@@ -1,6 +1,6 @@
 # yubioath-dmenu
 
-Automate typing a TOTP selected using dmenu.
+Automate typing a TOTP selected using dmenu. Requires <tt>yubioath>, and <tt>xdotool</tt> if used in typing mode.
 
 ## Usage
 
